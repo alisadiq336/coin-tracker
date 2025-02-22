@@ -1,0 +1,296 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Chat Interface</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        /* Add your CSS here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .main-container {
+            width: 400px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0 0;
+        }
+
+        .suggestion-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .suggestion-list.hidden {
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .suggestion {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .suggestion:hover {
+            background-color: #e0e0e0;
+        }
+
+        .suggestion .text {
+            flex: 1;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .suggestion .icon {
+            font-size: 20px;
+            color: #666;
+        }
+
+        .typing-area {
+            margin-top: 20px;
+        }
+
+        .typing-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 5px 10px;
+        }
+
+        .input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+        }
+
+        #sendButton {
+            display: none;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: #007bff;
+        }
+
+        .side-icons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .side-icons .icon {
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .disclaimer-text {
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header class="header">
+            <h2 class="title">How Can Help you Related Crypto Cruncey</h2>
+            <h4 class="subtitle">How can I help you today?</h4>
+        </header>
+        <ul class="suggestion-list" id="suggestion-list">
+            <li class="suggestion">
+                <h4 class="text">Help me plan a game night with my 5 best friends for under $100</h4>
+                <span class="icon material-symbols-rounded">draw</span>
+            </li>
+            <li class="suggestion">
+                <h4 class="text">What are the best tips to improve my public speaking?</h4>
+                <span class="icon material-symbols-rounded">lightbulb</span>
+            </li>
+            <li class="suggestion">
+                <h4 class="text">Can you help me with the latest news on web development?</h4>
+                <span class="icon material-symbols-rounded">explore</span>
+            </li>
+            <li class="suggestion">
+                <h4 class="text">Write JavaScript code to sum all elements in an array.</h4>
+                <span class="icon material-symbols-rounded">code</span>
+            </li>
+        </ul>
+        <div class="typing-area">
+            <form action="#" class="typing-form">
+                <div class="form-container">
+                    <div class="input-wrapper">
+                        <input type="text" placeholder="Enter a prompt here" class="input" required oninput="toggleSendButton()">
+                        <button id="sendButton" type="submit" class="icon material-symbols-rounded">send</button>
+                    </div>
+                    <div class="side-icons">
+                        <button type="button" class="icon material-symbols-rounded">light_mode</button>
+                        <button type="button" class="icon material-symbols-rounded">delete</button>
+                    </div>
+                </div>
+            </form>
+            <p class="disclaimer-text">
+                Gemini may display inaccurate info, including about people, so double-check its responses.
+            </p>
+        </div>
+    </div>
+    <script>
+        const API_KEY = 'AIzaSyDY1sbV_jQh_ob6xvZafkDIY_2qhPvwOaI'; // Replace with your Gemini API key
+        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
+
+        const inputField = document.querySelector('.input');
+        const suggestionList = document.getElementById('suggestion-list');
+        const sendButton = document.getElementById('sendButton');
+
+        // Toggle Send Button
+        function toggleSendButton() {
+            sendButton.style.display = inputField.value.trim() ? 'flex' : 'none';
+        }
+
+        // Hide suggestions when input is focused or typed into
+        inputField.addEventListener('focus', () => {
+            suggestionList.classList.add('hidden');
+        });
+
+        inputField.addEventListener('input', () => {
+            if (inputField.value.trim() !== "") {
+                suggestionList.classList.add('hidden');
+            } else {
+                suggestionList.classList.remove('hidden');
+            }
+        });
+
+        // Show suggestions when input is empty and loses focus
+        inputField.addEventListener('blur', () => {
+            if (inputField.value.trim() === "") {
+                suggestionList.classList.remove('hidden');
+            }
+        });
+
+        // Send Message
+        document.querySelector('.typing-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            const userInput = inputField.value;
+            if (userInput.trim() === "") return;
+
+            // Display user message
+            const chatBox = document.createElement('div');
+            chatBox.classList.add('chat-list');
+            chatBox.innerHTML = `
+                <div class="message outgoing">
+                    <div class="message-content">
+                        <img src="images/user.jpg" alt="User Image" class="avatar">
+                        <p class="text">${userInput}</p>
+                    </div>
+                </div>
+            `;
+            document.querySelector('.main-container').insertBefore(chatBox, document.querySelector('.typing-area'));
+
+            // Clear input
+            inputField.value = "";
+            toggleSendButton(); // Hide send button after sending
+
+            // Get bot response from Gemini API
+            try {
+                const botResponse = await getGeminiResponse(userInput);
+                const botMessage = document.createElement('div');
+                botMessage.classList.add('chat-list');
+                botMessage.innerHTML = `
+                    <div class="message incoming">
+                        <div class="message-content">
+                            <img src="images/gemini.svg" alt="Gemini Image" class="avatar">
+                            <p class="text">${botResponse}</p>
+                        </div>
+                    </div>
+                `;
+                document.querySelector('.main-container').insertBefore(botMessage, document.querySelector('.typing-area'));
+            } catch (error) {
+                console.error("Error fetching response from Gemini API:", error);
+                const errorMessage = document.createElement('div');
+                errorMessage.classList.add('chat-list');
+                errorMessage.innerHTML = `
+                    <div class="message incoming">
+                        <div class="message-content">
+                            <img src="images/gemini.svg" alt="Gemini Image" class="avatar">
+                            <p class="text">Sorry, I couldn't process your request.</p>
+                        </div>
+                    </div>
+                `;
+                document.querySelector('.main-container').insertBefore(errorMessage, document.querySelector('.typing-area'));
+            }
+        });
+
+        // Fetch Gemini API Response
+        async function getGeminiResponse(userInput) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: userInput
+                        }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts[0]) {
+                throw new Error("Invalid response structure from Gemini API");
+            }
+            return data.candidates[0].content.parts[0].text;
+        }
+    </script>
+</body>
+</html> 
